@@ -1,0 +1,27 @@
+# Fuerza a usar LF en todo (más estándar en repositorios)
+* text=auto eol=lf
+
+# Archivos de Python siempre con LF
+*.py text eol=lf
+
+# Notebooks Jupyter también con LF
+*.ipynb text eol=lf
+
+# Archivos de configuración
+*.md text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.csv text eol=lf
+
+# Archivos binarios (no se deben modificar)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.pkl binary
+*.zip binary
+*.gz binary
+*.exe binary
