@@ -1,3 +1,4 @@
+import time
 from langgraph.graph import StateGraph
 from typing import TypedDict, List
 from agents import (
@@ -20,6 +21,7 @@ class AgentState(TypedDict):
 
 def router_node(state):
     active = router_agent(state["user_input"])
+    time.sleep(8)  # deja que el TPM se resetee antes del primer agente grande
     return {"active_modules": active}
 
 
@@ -27,6 +29,7 @@ def nutricion_node(state):
     if "nutricion" not in state.get("active_modules", []):
         return {"nutricion": ""}
     result = nutricionista_agent(state["user_input"], state["memory"])
+    time.sleep(10)  # espera generosa antes del siguiente agente
     return {"nutricion": result}
 
 
@@ -34,6 +37,7 @@ def entrenamiento_node(state):
     if "entrenamiento" not in state.get("active_modules", []):
         return {"entrenamiento": ""}
     result = entrenador_agent(state["user_input"], state["memory"])
+    time.sleep(10)
     return {"entrenamiento": result}
 
 
@@ -46,7 +50,6 @@ def motivacion_node(state):
 
 def respuesta_final_node(state):
     sections = []
-
     if state.get("nutricion"):
         sections.append(("🥗 Nutrición", state["nutricion"]))
     if state.get("entrenamiento"):
@@ -57,7 +60,6 @@ def respuesta_final_node(state):
     final = "\n\n".join(
         f"**{title}**\n{content}" for title, content in sections
     )
-
     return {"final_response": final}
 
 

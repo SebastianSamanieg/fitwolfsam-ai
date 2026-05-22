@@ -5,21 +5,27 @@ load_dotenv()
 
 
 class LLMBuilder:
-    def __init__(self, temperature: float):
+    def __init__(self, temperature: float, model_override: str = None):
         if temperature is None:
             raise ValueError("Debes especificar la temperatura al instanciar LLMBuilder")
 
         self.provider = os.getenv("LLM_PROVIDER", "GROQ").upper()
         self.temperature = float(temperature)
+        self.model_override = model_override
         self.llm = self._initialize_llm()
 
     def _initialize_llm(self):
         if self.provider == "GROQ":
             from langchain_groq import ChatGroq
+            model = self.model_override or os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+            # max_tokens debe ser menor que el límite TPM de Groq (6000 plan gratuito)
+            # Para el router usamos 50, para agentes 2000
+            max_tok = 50 if "instant" in model else 2000
             return ChatGroq(
-                model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+                model=model,
                 api_key=os.getenv("GROQ_API_KEY"),
                 temperature=self.temperature,
+                max_tokens=max_tok,
             )
 
         elif self.provider == "OPENAI":
@@ -30,6 +36,7 @@ class LLMBuilder:
                 azure_endpoint=os.getenv("OPENAI_ENDPOINT"),
                 api_key=os.getenv("OPENAI_API_KEY"),
                 api_version=os.getenv("OPENAI_API_VERSION"),
+                max_tokens=4096,
             )
 
         elif self.provider == "GOOGLE":
@@ -38,6 +45,7 @@ class LLMBuilder:
                 model=os.getenv("GOOGLE_MODEL", "gemini-1.5-flash"),
                 api_key=os.getenv("GOOGLE_API_KEY"),
                 temperature=self.temperature,
+                max_output_tokens=4096,
             )
 
         else:
